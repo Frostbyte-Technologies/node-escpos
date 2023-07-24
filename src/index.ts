@@ -856,6 +856,10 @@ export class Printer<AdapterCloseArgs extends []> extends EventEmitter {
     return this;
   };
 
+  rawWrite(data: string) {
+    this.buffer.write(data);
+  }
+
   /**
    * get one specific status from the printer using it's class
    * @param  {string} statusClass
