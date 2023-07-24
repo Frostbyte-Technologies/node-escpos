@@ -1,20 +1,22 @@
-## ESCPOS PROJECT
+# ESCPOS
 
-ESC/POS Printer driver for Node.js
+ESC/POS Printer driver for node
 
+[![NPM](https://nodei.co/npm/escpos.png?downloads=true&downloadRank=true&stars=true)](https://npmjs.org/escpos )
 [![npm version](https://badge.fury.io/js/escpos.svg)](https://www.npmjs.com/package/escpos )
 [![Build Status](https://travis-ci.org/song940/node-escpos.svg?branch=master)](https://travis-ci.org/song940/node-escpos)
 
-[![NPM](https://nodei.co/npm/escpos.png?downloads=true&downloadRank=true&stars=true)](https://npmjs.org/escpos )
+## Installation
 
-Packages Available:
+### npm
+```bash
+$ npm i escpos --save
+```
 
-+ [escpos Printer](packages/printer/README.md)
-+ [escpos Screen Display](packages/screen/README.md)
-+ [escpos USB Adapter](packages/usb/README.md)
-+ [escpos Network Adapter](packages/network/README.md)
-+ [escpos Bluetooth Adapter](packages/bluetooth/README.md)
-+ [escpos SerialPort Adapter](packages/serialport/README.md)
+### yarn
+```bash
+$ yarn add escpos
+```
 
 ## Example
 
@@ -60,6 +62,164 @@ device.open(function(error){
 
 ----
 
+## Printer
+
+### Constructors
+
+#### Printer(device)
+
+```javascript
+const usbDevice = new escpos.USB();
+const usbPrinter = new escpos.Printer(usbDevice);
+
+const serialDevice = new escpos.Serial('/dev/usb/lp0');
+const serialPrinter = new escpos.Printer(serialDevice);
+
+const bluetoothDevice = new escpos.Bluetooth('01:23:45:67:89:AB', 1);
+const bluetoothPrinter = new escpos.Printer(bluetoothDevice);
+
+const networkDevice = new escpos.Network('localhost');
+const networkPrinter = new escpos.Printer(networkDevice);
+```
+
+### Methods
+
+Escpos inherits its methods to the printers. the following methods are defined:
+
+#### text("text", encodeType)
+
+Prints raw text. Raises TextError exception.
+
+For the encode type, see the [iconv-lite wiki document](https://github.com/ashtuchkin/iconv-lite/wiki/Supported-Encodings). Escpos uses `iconv-lite` for encoding.
+
+If the type is undefined, the default type is GB18030.
+
+#### async image(imagePath, "density")
+
+Prints an image at a set density.
+
+Density consists of a character signaling the base density setting, `s` for single, `d` for double, followed by an integer for image sampling - `8` (8-bit) or `24`.
+
+```javascript
+printer.align('ct')
+       .image(image, 's8')
+       .then(() => { 
+          printer.cut()
+                 .close(); 
+       });
+```
+
+#### encode("encodeType")
+
+Sets the encoding value globally. default type is GB18030 (Chinese)
+
+```javascript
+printer
+.encode('EUC-KR')
+.text('동해물과 백두산이 마르고 닳도록');
+```
+
+#### control("align")
+
+Carrier feed and tabs.
+
+align is a string which takes any of the following values:
+
++ LF for Line Feed
++ FF for Form Feed
++ CR for Carriage Return
++ HT for Horizontal Tab
++ VT for Vertical Tab
+
+
+#### align("align")
+
+Set text properties.
+
+align set horizontal position for text, the possible values are:
+
++ CT is the Center alignment
++ LT is the Left alignment
++ RT is the Right alignment
+
+Default: LT
+
+#### font("type")
+font type could be A or B. Default: A
+
+#### size(width, heigth)
+
+width is a numeric value, 1 is for regular size, and 2 is twice the standard size. Default: 1
+
+height is a numeric value, 1 is for regular size and 2 is twice the standard size. Default: 1
+
+
+
+#### barcode("code", "barcodeType", "options")
+
+Prints a barcode.
+
+"code" is an alphanumeric code to be printed as bar code
+"barcodeType" must be one of the following type of codes:
+
++ UPC-A
++ UPC-E
++ EAN13
++ EAN8
++ CODE39
++ ITF
++ NW7
+
+The EAN type automatically calculates the last parity bit. For the EAN13 type, the length of the string is limited to 12, and EAN8 is limited to 7. (#57)
+If you wish to disable the parity bit you must set `"includeParity": false` in the options provided to the command.
+
+**"options"**
+
+- "options.width" (default=1) is a numeric value ranging between 1 up to 5. 
+- "options.height" (default=100) is a numeric value ranging between 1 up to 255.
+- "options.includeParity" (default=true) When true parity bit is calculated for EAN13/EAN8 bar code
+- "options.position" (default=BLW) where to place the barcode numeric value: OFF|ABV|BLW|BTH
+
+  + ABV = ABOVE
+  + BLW = BELOW
+  + BTH = BOTH
+  + OFF = OFF
+
+- "options.font" (default=A) the font size: A|B
+
+
+Raises BarcodeTypeError, BarcodeSizeError, BarcodeCodeError exceptions.
+
+For backward compatibility the old method interface is still supported:
+
+
+  barcode("code", "barcodeType", width, height, "position", "font")
+
+#### cut("mode")
+
+Cut paper.
+
+mode set a full or partial cut. Default: full
+Partial cut is not implemented in all printers.
+
+*** Don't foget this, because cut will flush buffer to printer ***
+
+#### cashdraw(pin)
+
+Sends a pulse to the cash drawer in the specified pin.
+
+pin is a numeric value which defines the pin to be used to send the pulse, it could be 2 or 5.
+Raises `CashDrawerError()``
+
+#### beep(n,t)
+
+Printer Buzzer (Beep sound).
+
+"n" Refers to the number of buzzer times.
+"t" Refers to the buzzer sound length in (t * 100) milliseconds.
+
+----
+
 ## Screencast
 
 ![img_1031](https://user-images.githubusercontent.com/8033320/29250339-d66ce470-807b-11e7-89ce-9962da88ca18.JPG)
@@ -93,7 +253,7 @@ Thanks to our [contributors][contributors-href] 🎉👏
 ----
 
 ### MIT license
-Copyright (c) 2015 ~ now Lsong <hi@lsong.org>
+Copyright (c) 2015 lsong
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the &quot;Software&quot;), to deal
@@ -116,4 +276,3 @@ THE SOFTWARE.
 ---
 
 [contributors-href]: https://github.com/song940/node-escpos/graphs/contributors
-
