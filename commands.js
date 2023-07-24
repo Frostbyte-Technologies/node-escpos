@@ -71,8 +71,8 @@ _.HARDWARE = {
  * @type {Object}
  */
 _.CASH_DRAWER = {
-  CD_KICK_2: '\x1b\x70\x00\x19\xfa', // Sends a pulse to pin 2 []
-  CD_KICK_5: '\x1b\x70\x01\x19\xfa', // Sends a pulse to pin 5 []
+  CD_KICK_2: '\x1b\x70\x00\x19\x78', // Sends a pulse to pin 2 []
+  CD_KICK_5: '\x1b\x70\x01\x19\x78', // Sends a pulse to pin 5 []
 };
 
 /**
@@ -108,12 +108,12 @@ _.TEXT_FORMAT = {
   TXT_4SQUARE: '\x1b\x21\x30', // Double width & height text
 
   TXT_CUSTOM_SIZE: function(width, height) { // other sizes
-    
+
     width = width > 7 ? 7 : width;
     width = width < 0 ? 0 : width;
     height = height > 7 ? 7 : height;
     height = height < 0 ? 0 : height;
-    
+
     var widthDec = width * 16; // Values between 0-7
     var heightDec = height; // Values between 0-7
     var sizeDec = widthDec + heightDec;
@@ -306,7 +306,7 @@ _.GSV0_FORMAT = {
  * @type {string}
  */
 _.BEEP = '\x1b\x42', // Printer Buzzer pre hex
-  
+
 /**
  * [COLOR description]
  * @type {Object}
